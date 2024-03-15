@@ -1,0 +1,7 @@
+version: '3'
+services:
+  kafka-producer:
+    image: kafka-producer:latest
+    network_mode: host
+    deploy:
+      replicas: 200
