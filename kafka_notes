@@ -1,0 +1,92 @@
+wget https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz
+tar -xzf kafka_2.13-3.7.0.tgz
+sudo mv kafka_2.13-3.0.0 /usr/local/kafka
+cd /usr/local/kafka
+bin/zookeeper-server-start.sh config/zookeeper.properties
+bin/kafka-server-start.sh config/server.properties
+bin/kafka-topics.sh --create --topic example-topic --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1
+bin/kafka-console-producer.sh --topic example-topic --bootstrap-server localhost:9092
+bin/kafka-console-consumer.sh --topic example-topic --from-beginning --bootstrap-server localhost:9092
+
+sudo nano /etc/systemd/system/kafka.service
+ADD:
+[Unit]
+Description=Apache Kafka Server
+Documentation=http://kafka.apache.org/documentation.html
+Requires=zookeeper.service
+After=zookeeper.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/kafka/bin/kafka-server-start.sh /path/to/your/kafka/config/server.properties
+ExecStop=/usr/local/kafka/bin/kafka-server-stop.sh
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target
+
+sudo nano /etc/systemd/system/zookeeper.service
+ADD:
+[Unit]
+Description=Apache Zookeeper server
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/kafka/bin/zookeeper-server-start.sh /usr/local/kafka/config/zookeeper.properties
+ExecStop=/usr/local/kafka/bin/zookeeper-server-stop.sh
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target
+
+
+RELOAD:
+sudo systemctl daemon-reload
+
+ENABLE:
+sudo systemctl enable zookeeper
+sudo systemctl start zookeeper
+sudo systemctl enable kafka
+sudo systemctl start kafka
+
+
+Docker and Docker Compose????
+version: '2'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+This setup will start ZooKeeper and Kafka containers, making Kafka accessible on your host at localhost:9092.
+
+Each of these approaches has its advantages and can be chosen based on your specific needs, such as ease of use, scalability, environment (development vs. production), and preference for graphical interfaces.
+
+#### COMMUNICATIONS:
+bin/kafka-topics.sh --create --topic myTopic --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1
+bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+bin/kafka-console-producer.sh --broker-list localhost:9092 --topic myTopic
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic myTopic --from-beginning
+
+Interact through python with `kafka-python`
+
+echo 'export KAFKA_HOME=/usr/local/kafka' >> ~/.bashrc
+echo 'export PATH=$PATH:$KAFKA_HOME/bin:$KAFKA_HOME/sbin' >> ~/.bashrc
+source ~/.bashrc

@@ -1,0 +1,9 @@
+wget https://dlcdn.apache.org/spark/spark-3.5.1/spark-3.5.1-bin-hadoop3-scala2.13.tgz
+
+sudo tar zxvf spark-3.5.1-bin-hadoop3-scala2.13.tgz -C /opt
+sudo mv /opt/spark-3.5.1-bin-hadoop3-scala2.13.tgz /opt/spark
+echo 'export SPARK_HOME=/opt/spark-3.5.1-bin-hadoop3-scala2.13' >> ~/.bashrc
+echo 'export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin' >> ~/.bashrc
+source ~/.bashrc
+
+Python can use PyPI using `pip install pyspark`
