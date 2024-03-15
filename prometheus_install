@@ -1,0 +1,6 @@
+wget https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.20.0/jmx_prometheus_javaagent-0.20.0.jar
+wget https://github.com/prometheus/prometheus/releases/download/v2.50.1/prometheus-2.50.1.linux-amd64.tar.gz
+mv jmx_prometheus_javaagent-0.20.0.jar $KAFKA_HOME
+echo 'rules:
+- pattern: ".*"' > kafka.yml
+export KAFKA_OPTS="-javaagent:$KAFKA_HOME/jmx_prometheus_javaagent-0.20.0.jar=7071:$KAFKA_HOME/kafka.yml"
