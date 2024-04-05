@@ -1,5 +1,6 @@
-# Kafka Zookeeper
-sudo docker build -t zookeeper_jmx .
+## Building 
+cd docker/zookeeper
+sudo docker build -t zookeeper .
 
-## Run zookeeper
-sudo docker run -p 2181:2181 -p 5555:5555 -d zookeeper_jmx
+## Run manual zookeeper
+sudo docker run -itd --name zookeeper --network iotnet -p 2181:2181 -p 5555:5555 zookeeper

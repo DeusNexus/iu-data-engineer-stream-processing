@@ -1,3 +1,10 @@
+# Building
+cd docker/cassandra
+sudo docker build -t cassandra .
+
+## Run manual cassandra
+sudo docker run -itd --name cassandra --network iotnet -p 9042:9042 -p 7000:7000 -p 7001:7001 -p 7199:7199 cassandra
+
 ## Make sure iotnet is created as docker network (driver=bridge)
 
 1. Run the cassandra database on iotnet using `docker/cassandra/docker-compose up`.
