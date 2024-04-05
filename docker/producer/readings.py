@@ -53,12 +53,18 @@ class Station:
         return [station_readings]
 
     def generate_and_collect_data(self):
-        station_sensor_data = {self.station_id: {sensor.name: [] for sensor in self.sensors}}
+        # Initialize the dictionary with station_id.
+        station_sensor_data = {'station_id': self.station_id}
+        
+        # Generate sensor readings.
         station_readings = self.generate_station_readings()
 
+        # Iterate through each reading and assign the value to the respective sensor key.
         for reading in station_readings:
             for sensor_name, value in reading.items():
+                # Make sure we're only dealing with sensor data, not metadata like 'timestamp' or 'station_id'.
                 if sensor_name not in ['timestamp', 'station_id']:
-                    station_sensor_data[self.station_id][sensor_name].append(value)
+                    station_sensor_data[sensor_name] = value  # Assigning the scalar value directly.
 
         return station_sensor_data
+

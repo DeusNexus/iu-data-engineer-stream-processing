@@ -30,6 +30,65 @@ JSON model, sample distribution, velocity
 ## Cassandra
 ..
 
+# Docker Deploy Kafka
+SELF NOTE: DONT USE VPN!!!!
+1. Create a Docker Network using bridge
+- `sudo docker network create -d bridge kafka-net`
+1. Spin up zookeeper_jmx (the zookeeper orchestrates all the kafka brokers and is required) (Important to give it the name `zookeeper`)
+- `sudo docker run -it --rm --name zookeeper --net kafka-net -p 2181:2181 -p 7071:7071 zookeeper_jmx`
+2. Spin up brokers using broker_jmx (these will hold the topic(s) that are being received by consumers and broadcasted by producer)
+- `sudo docker run --net kafka-net --rm --name broker-1 -p 9092:9092 -p 7072:7072 broker_jmx` => Consequent brokers can be called --name broker-2, broker-3 etc.
+- `sudo docker exec -it -e KAFKA_OPTS="" broker-1 /bin/bash` Now we need to set KAFKA_OPTS="" otherwise we will get error!
+- `/usr/local/kafka/bin/kafka-topics.sh --create --topic iot-sensor-stream --bootstrap-server broker-1:9092 --replication-factor 1 --partitions 3` Topic creation
+- `exit`
+3. Topic has been created for the brokers, the zookeeper propegates the topic to all running brokers. Now we need to publish sensor data to the kafka topic by spinning up the docker image `producer`
+- `sudo docker run -it --rm --name producer-1 --net kafka-net kafka_producer`
+4. Or alternatively can use docker-compose inside of the docker/kafka-producer folder. This will start N replicates as specified in the docker-compose.yml file.
+- `sudo docker-compose up`
+5. The topic is being populated now with new messages. To view the stream as a consumer do following (this assumes all the docker containers are on same network) and consumer is opened from local machine:
+`./kafka-console-consumer.sh --bootstrap-server broker-1:9092 --topic iot-sensor-stream --from-beginning`
+
+
+## Dashboards Metrics
+Prometheus uses JMX to export metrics from Kafka to port 7071, 7072, 7072 (the zookeeper and each broker will have their own unique port that should be included in the prometheus config file.)
+Prometheus: http://localhost:9090/graph?g0.expr=kafka_server_brokertopicmetrics_bytesin_total
+Prometheus root dir: /usr/local/prometheus-2.50.1.linux-amd64
+Prometheus Config File: /usr/local/prometheus-2.50.1.linux-amd64/prometheus.yml
+Config File Example:
+``
+    # my global config
+    global:
+    scrape_interval: 2s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+    evaluation_interval: 2s # Evaluate rules every 15 seconds. The default is every 1 minute.
+    # scrape_timeout is set to the global default (10s).
+
+    # Alertmanager configuration
+    alerting:
+    alertmanagers:
+        - static_configs:
+            - targets:
+            # - alertmanager:9093
+
+    # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+    rule_files:
+    # - "first_rules.yml"
+    # - "second_rules.yml"
+
+    # A scrape configuration containing exactly one endpoint to scrape:
+    # Here it's Prometheus itself.
+    scrape_configs:
+    # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+    - job_name: "kafka"
+
+        # metrics_path defaults to '/metrics'
+        # scheme defaults to 'http'.
+
+        static_configs:
+        - targets: ["localhost:7071","localhost:7072"]
+``
+
+Grafana: http://localhost:3000/dashboards
+
 ## Evaluation
 ..
 

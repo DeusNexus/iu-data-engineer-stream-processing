@@ -5,9 +5,9 @@ from kafka import KafkaProducer
 from readings import Station
 
 # Kafka configuration
-kafka_broker = "localhost:9092"  # Replace with your Kafka broker address
+kafka_broker = "broker:9092"  # Replace with your Kafka broker address
 topic_name = "iot-sensor-stream"
-station_id = f'station_{uuid.uuid4().hex[:8]}'
+station_id = f'station_{uuid.uuid4().hex[:9]}'
 
 # Initialize Kafka producer
 producer = KafkaProducer(bootstrap_servers=[kafka_broker])

@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  producer:
+    image: producer
+    deploy:
+      replicas: 50
+    networks:
+      - iotnet
+
+networks:
+  iotnet:
+    external: true
