@@ -25,9 +25,18 @@ Diagram -
 JSON model, sample distribution, velocity
 
 ## Kafka
+`docker push deusnexus/zookeeper`
+`docker push deusnexus/broker`
+`docker push deusnexus/client`
+`docker push deusnexus/producer`
+`docker push deusnexus/prometheus`
 ..
 
+# Spark Streaming
+`docker push deusnexus/spark-processing`
+
 ## Cassandra
+`docker push deusnexus/cassandra`
 ..
 
 # Docker Deploy Kafka
