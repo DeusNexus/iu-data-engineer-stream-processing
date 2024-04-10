@@ -19,7 +19,7 @@ Periodic processing of batches can help to gain insight into long term developme
 # Development Planning - UML Schemas
 ## UML Diagram
 Diagram -
-![Design of ](/images/UML.jpg)
+![Design of ](/images/uml.jpg)
 
 ## Sensor Data Overview
 JSON model, sample distribution, velocity
