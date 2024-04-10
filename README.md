@@ -22,7 +22,24 @@ Diagram -
 ![Design of ](/images/uml.jpg)
 
 ## Sensor Data Overview
-JSON model, sample distribution, velocity
+
+The following sensors are augmented using random samples from their normal distributions while also using trend of last 300 readings.
+Drift too far from the mean values is limited by using a simple recalibaration_rate set to 0.2
+- temperature: μ=25 σ=2
+- humidity: μ=60 σ=3
+- pressure: μ=1013 σ=2
+- air_quality: μ=200 σ=20
+- particulate_matter: μ=30 σ=2
+- noise_level: μ=50 σ=3
+- illuminance: μ=500 σ=50
+- wind_speed: μ=5 σ=20
+- rainfall: μ=0 σ=3
+
+![IoT Sensor Producers](/images/station_sensor_generation.gif)
+
+The gif illustrates generations of the sensor data for different sensor stations. The iot stations will publish this data to the kafka topic to emulate real world sensor data collection.
+One benefit is that the data frequency can easily be changed is unique and still follows an expected distributionn. Outliers will occur at times and we could calculate how often values below or above a certain percetile would occur.
+In Spark Streaming the distributions are known for each sensor and we can therefor assess wether the received station readings are outlier or not and include it as enriched data when writing to Apache Cassandra for storage.
 
 ## Kafka
 `docker push deusnexus/zookeeper`
