@@ -7,4 +7,5 @@ zx*
 archive/
 __pycache__
 .drawio
+.drawio.bkp
 notes
