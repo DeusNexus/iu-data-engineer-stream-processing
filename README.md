@@ -23,20 +23,27 @@ Diagram -
 
 ## Running the containers
 Create the iotnet network which the docker containers can connect to:
+
 `docker network create iotnet`
 
 Terminal 1 - First start the Apache Cassandra Database (required for spark to connect to!):
+
 `cd /docker/cassandra/docker-compose & docker-compose up`
 
 Terminal 2 - Start the zookeeper, broker, prometheus and spark-processing:
+
 `cd /docker & docker-compose up`
 
 Terminal 3 - Now that Cassandra and Topic on broker is ready we can start publishing messages using producerse (these are the iot sensor stations creating readings):
+
 `cd /docker/producer & docker-compose up`
+
 Note that you can also change the number of producers in the docker-compose.yaml file if you wish to increase the load.
 
 Terminal 4 - The messages should be published from the producers to the broker topic and then be read by the spark-processing pipeline to finally be written to Apache Cassandra Database.
+
 You can also optionally start Grafana to view the metrics on dashboard (http://localhost:3001). Username: admin Password: admin
+
 `cd /docker/grafana & docker-compose up`
 
 It's also possible to run it as a daemon in background but you won't be able to see the console output.
