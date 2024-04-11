@@ -21,6 +21,27 @@ Periodic processing of batches can help to gain insight into long term developme
 Diagram -
 ![Design of ](/images/uml.jpg)
 
+## Running the containers
+Create the iotnet network which the docker containers can connect to:
+`docker network create iotnet`
+
+Terminal 1 - First start the Apache Cassandra Database (required for spark to connect to!):
+`cd /docker/cassandra/docker-compose & docker-compose up`
+
+Terminal 2 - Start the zookeeper, broker, prometheus and spark-processing:
+`cd /docker & docker-compose up`
+
+Terminal 3 - Now that Cassandra and Topic on broker is ready we can start publishing messages using producerse (these are the iot sensor stations creating readings):
+`cd /docker/producer & docker-compose up`
+Note that you can also change the number of producers in the docker-compose.yaml file if you wish to increase the load.
+
+Terminal 4 - The messages should be published from the producers to the broker topic and then be read by the spark-processing pipeline to finally be written to Apache Cassandra Database.
+You can also optionally start Grafana to view the metrics on dashboard (http://localhost:3001). Username: admin Password: admin
+`cd /docker/grafana & docker-compose up`
+
+It's also possible to run it as a daemon in background but you won't be able to see the console output.
+
+
 ## Sensor Data Overview
 
 The following sensors are augmented using random samples from their normal distributions while also using trend of last 300 readings.
@@ -37,11 +58,14 @@ Drift too far from the mean values is limited by using a simple recalibaration_r
 
 ![IoT Sensor Producers](/images/station_sensor_generation.gif)
 
-The gif illustrates generations of the sensor data for different sensor stations. The iot stations will publish this data to the kafka topic to emulate real world sensor data collection.
-One benefit is that the data frequency can easily be changed is unique and still follows an expected distributionn. Outliers will occur at times and we could calculate how often values below or above a certain percetile would occur.
-In Spark Streaming the distributions are known for each sensor and we can therefor assess wether the received station readings are outlier or not and include it as enriched data when writing to Apache Cassandra for storage.
 
-## Kafka
+The gif illustrates generations of the sensor data for different sensor stations. The iot stations will publish this data to the kafka topic to emulate real world sensor data collection.
+One benefit is that the data frequency can easily be changed is unique and still follows an expected distributionn. 
+
+Outliers will occur at times and we could calculate how often values below or above a certain percetile would occur.
+In Spark Streaming the distributions are known for each sensor and we can therefor assess whether the received station readings are outlier or not and include it as enriched data when writing to Apache Cassandra for storage.
+
+## Apache Kafka
 `docker push deusnexus/zookeeper`
 `docker push deusnexus/broker`
 `docker push deusnexus/client`
@@ -49,15 +73,15 @@ In Spark Streaming the distributions are known for each sensor and we can theref
 `docker push deusnexus/prometheus`
 ..
 
-# Spark Streaming
+# Apache Spark Streaming
 `docker push deusnexus/spark-processing`
 
-## Cassandra
+## Apache Cassandra
 `docker push deusnexus/cassandra`
 ..
 
 # Docker Deploy Kafka
-SELF NOTE: DONT USE VPN!!!!
+Note: Don't use a VPN that blocks local intranet access.
 1. Create a Docker Network using bridge
 - `sudo docker network create -d bridge kafka-net`
 1. Spin up zookeeper_jmx (the zookeeper orchestrates all the kafka brokers and is required) (Important to give it the name `zookeeper`)

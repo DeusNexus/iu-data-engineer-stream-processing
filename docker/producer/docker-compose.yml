@@ -2,7 +2,7 @@ version: '3'
 
 services:
   producer:
-    image: producer
+    image: deusnexus/producer
     deploy:
       replicas: 5
     networks:

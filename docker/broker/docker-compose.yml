@@ -1,7 +1,7 @@
 version: '3'
 services:
   broker:
-    image: broker  # Your custom image
+    image: deusnexus/broker  # Your custom image
     ports:
       - "9092:9092"
       - "5555:5555"  # JMX Exporter port for broker-1

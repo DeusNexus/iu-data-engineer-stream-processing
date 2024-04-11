@@ -3,7 +3,7 @@ version: '3'
 services:
   cassandra:
     container_name: cassandra
-    image: cassandra
+    image: deusnexus/cassandra
     networks:
       - iotnet
     ports:
@@ -14,7 +14,7 @@ services:
 
   cassandra-init:
     container_name: cassandra-init
-    image: cassandra
+    image: deusnexus/cassandra
     depends_on:
       - cassandra
     volumes:

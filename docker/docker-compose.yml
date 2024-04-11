@@ -3,7 +3,7 @@ version: '3'
 services:
   zookeeper:
     container_name: zookeeper
-    image: zookeeper
+    image: deusnexus/zookeeper
     networks:
       - iotnet
     ports:
@@ -12,7 +12,7 @@ services:
 
   broker:
     container_name: broker
-    image: broker
+    image: deusnexus/broker
     depends_on:
       - zookeeper
     networks:
@@ -30,7 +30,7 @@ services:
   
   broker-2:
     container_name: broker-2
-    image: broker
+    image: deusnexus/broker
     depends_on:
       - broker
     networks:
@@ -49,7 +49,7 @@ services:
       
   broker-3:
     container_name: broker-3
-    image: broker
+    image: deusnexus/broker
     depends_on:
       - broker-2
     networks:
@@ -68,7 +68,7 @@ services:
 
   client:
     container_name: client
-    image: client
+    image: deusnexus/client
     depends_on:
       - broker-3
     networks:
@@ -78,7 +78,7 @@ services:
 
   prometheus:
     container_name: prometheus
-    image: prometheus
+    image: deusnexus/prometheus
     depends_on:
       - client
     networks:
@@ -88,7 +88,7 @@ services:
 
   spark-processing:
     container_name: spark-processing
-    image: spark-processing
+    image: deusnexus/spark-processing
     depends_on:
       - broker-3
     networks:
