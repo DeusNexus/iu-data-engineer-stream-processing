@@ -49,7 +49,7 @@ You can also optionally start Grafana to view the metrics on dashboard (http://l
 
 It's also possible to run it as a daemon in background but you won't be able to see the console output.
 
-**Docker Deployment with docker-compose (~28mb):**
+**Docker Deployment with docker-compose (~28mb GIF):**
 ![Docker Deployment with docker-compose (~28mb)](/images/docker_compose.gif)
 
 
@@ -68,7 +68,7 @@ Drift too far from the mean values is limited by using a simple recalibaration_r
 - wind_speed: μ=5 σ=20
 - rainfall: μ=0 σ=3
 
-**IoT Sensor Producers (~23mb):**
+**IoT Sensor Producers (~23mb GIF):**
 ![IoT Sensor Producers (~23mb)](/images/station_sensor_generation.gif)
 
 
