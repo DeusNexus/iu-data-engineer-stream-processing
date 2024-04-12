@@ -181,10 +181,9 @@ Grafana: http://localhost:3001/dashboards
 # How to get started
 ## Installation instructions
 1. Download the Git repo using `git clone https://github.com/DeusNexus/iu-data-engineer-stream-processing`
-2. Open folder using `cd iu-data-engineer-stream-processing` and create a new virtual environment using `python3 -m venv venv`.
-3. Activate the virtual env using `source venv/bin/activate`. Now it should show (venv) in the terminal.
-4. Now you can install the python modules using `pip install -r requirements.txt`
-5. The working environment is now ready and you can run any script.
+2. Open folder using `cd iu-data-engineer-stream-processing`
+3. Install docker and docker-compose to your the local filesystem.
+4. Follow the steps from begin of README.md at the top ('Running the containers')
 
 # Reflection
 - What I learned ...
