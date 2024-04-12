@@ -19,10 +19,8 @@ Periodic processing of batches can help to gain insight into long term developme
 
 # Development Planning - UML Schemas
 ## UML Diagram
-Diagram -
+Docker Architecture Diagram
 ![Design of ](/images/uml.jpg)
-
-![Deploy ](/images/deploy.mp4)
 
 ## Running the containers
 Create the iotnet network which the docker containers can connect to:
@@ -51,6 +49,9 @@ You can also optionally start Grafana to view the metrics on dashboard (http://l
 
 It's also possible to run it as a daemon in background but you won't be able to see the console output.
 
+![Docker Deployment with docker-compose (~28mb)](/images/docker_compose.gif)
+
+
 
 ## Sensor Data Overview
 
@@ -66,7 +67,7 @@ Drift too far from the mean values is limited by using a simple recalibaration_r
 - wind_speed: μ=5 σ=20
 - rainfall: μ=0 σ=3
 
-![IoT Sensor Producers](/images/station_sensor_generation.gif)
+![IoT Sensor Producers (~23mb)](/images/station_sensor_generation.gif)
 
 
 The gif illustrates generations of the sensor data for different sensor stations. The iot stations will publish this data to the kafka topic to emulate real world sensor data collection.
