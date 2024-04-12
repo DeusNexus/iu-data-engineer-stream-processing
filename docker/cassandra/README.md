@@ -20,3 +20,8 @@ sudo docker run -itd --name cassandra --network iotnet -p 9042:9042 -p 7000:7000
 - SELECT * FROM spark_stream LIMIT 10;
 - SELECT COUNT(*) FROM spark_stream;
 - SELECT COUNT(*) FROM spark_stream WHERE station_id = 'station_...';
+
+# Other
+sudo docker-compose up -d # Run X containers as specified in docker-compose.yml
+sudo docker stop $(sudo docker ps -q) # Stop all containers
+sudo docker rm -f $(sudo docker ps -aq) # Remove all unused docker container labels

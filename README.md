@@ -22,6 +22,8 @@ Periodic processing of batches can help to gain insight into long term developme
 Diagram -
 ![Design of ](/images/uml.jpg)
 
+![Deploy ](/images/deploy.mp4)
+
 ## Running the containers
 Create the iotnet network which the docker containers can connect to:
 
