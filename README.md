@@ -127,6 +127,8 @@ Note: Don't use a VPN that blocks local intranet access.
 **Grafana Dashboard (login: admin - pass: admin) on localhost:3001:**
 ![Grafana Dashboard](/images/grafana.png)
 
+Original Dashboard can be found here: https://grafana.com/grafana/dashboards/11962-kafka-metrics/
+
 Prometheus uses JMX to export metrics from Kafka to port 7071, 7072, 7072 (the zookeeper and each broker will have their own unique port that should be included in the prometheus config file.)
 
 Prometheus: http://localhost:9090/graph?g0.expr=kafka_server_brokertopicmetrics_bytesin_total
