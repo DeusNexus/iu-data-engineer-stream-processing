@@ -123,10 +123,18 @@ Note: Don't use a VPN that blocks local intranet access.
 
 
 ## Dashboards Metrics
+
+**Grafana Dashboard (login: admin - pass: admin) on localhost:3001:**
+![Grafana Dashboard](/images/grafana.png)
+
 Prometheus uses JMX to export metrics from Kafka to port 7071, 7072, 7072 (the zookeeper and each broker will have their own unique port that should be included in the prometheus config file.)
+
 Prometheus: http://localhost:9090/graph?g0.expr=kafka_server_brokertopicmetrics_bytesin_total
+
 Prometheus root dir: /usr/local/prometheus-2.50.1.linux-amd64
+
 Prometheus Config File: /usr/local/prometheus-2.50.1.linux-amd64/prometheus.yml
+
 Config File Example:
 ``
     # my global config
@@ -160,7 +168,7 @@ Config File Example:
         - targets: ["localhost:7071","localhost:7072"]
 ``
 
-Grafana: http://localhost:3000/dashboards
+Grafana: http://localhost:3001/dashboards
 
 ## Evaluation
 ..
