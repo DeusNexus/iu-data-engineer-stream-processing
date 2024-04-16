@@ -28,6 +28,8 @@ RUN wget ${KAFKA_BASE_URL}/${KAFKA_VERSION}/kafka_2.13-${KAFKA_VERSION}.tgz \
 # Stage 2: Final stage
 FROM openjdk:11-jre-slim
 
+RUN apt-get update && apt-get install -y netcat
+
 # Re-declare ARG after FROM to use it in the build stage
 ARG KAFKA_VERSION
 
@@ -45,4 +47,4 @@ ENV PATH="${KAFKA_HOME}/bin:${PATH}"
 WORKDIR /usr/local/kafka/bin
 
 # Default command to create a topic as an example
-CMD ["kafka-topics.sh", "--create", "--topic", "iot-sensor-stream", "--bootstrap-server", "broker:9092", "--replication-factor", "1", "--partitions", "1"]
+CMD ["sh", "-c", "kafka-topics.sh --create --topic iot-sensor-stream --bootstrap-server broker:9092 --replication-factor 1 --partitions 1 && while true; do sleep 3600; done"]

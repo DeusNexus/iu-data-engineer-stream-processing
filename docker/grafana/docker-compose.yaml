@@ -8,6 +8,8 @@ services:
       - ./defaults.ini:/etc/grafana/grafana.ini
       - ./provisioning:/etc/grafana/provisioning
       - ./dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=1s
     network_mode: host
     # ports:
     #   - "3001:3001"

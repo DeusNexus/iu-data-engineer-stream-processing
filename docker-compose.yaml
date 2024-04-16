@@ -1,0 +1,232 @@
+version: '3'
+
+services:
+
+  ##############################################################
+  ## CASSANDRA IS ESSENTIAL TO RUN FIRST AS DATABASE SERVICE! ##
+  ##############################################################
+  cassandra:
+    container_name: cassandra
+    image: deusnexus/cassandra
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "SELECT now() FROM system.local;"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - iotnet
+    ports:
+      - "9042:9042"
+      - "7000:7000"
+      - "7001:7001"
+      - "7199:7199"
+      
+  #####################################################
+  ## AFTER CASSANDRA IS RUNNING THE TABLE IS CREATED ##
+  #####################################################
+  cassandra-init:
+    container_name: cassandra-init
+    image: deusnexus/cassandra
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    volumes:
+      - ./docker/cassandra/create.sql:/create.sql
+    command: >
+      /bin/bash -c "
+        echo 'Waiting for Cassandra to start...';
+        while ! cqlsh cassandra -e 'describe cluster' > /dev/null 2>&1; do
+          echo 'Cassandra is not up yet... waiting...';
+          sleep 15;
+        done;
+        echo 'Cassandra is up and running. Initializing schema...';
+        cqlsh cassandra -f /create.sql;
+        echo 'Schema initialized.';
+        while ! cqlsh cassandra -e 'DESCRIBE TABLE iot_stations.spark_stream' > /dev/null 2>&1; do
+          echo 'spark_stream table not found... waiting...';
+          sleep 5;
+        done;
+        echo 'spark_stream table is ready. Starting polling...';
+        while true; do
+          echo 'Polling spark_stream table...';
+          cqlsh cassandra -e 'SELECT * FROM iot_stations.spark_stream LIMIT 10;';
+          echo 'Waiting 5 seconds before next poll...';
+          sleep 5;
+        done"
+    networks:
+      - iotnet
+
+  ##################################################################
+  ## NOW KAFKA CAN START AND RUN ZOOKEEPER, BROKERS AND PRODUCERS ##
+  ##################################################################
+  zookeeper:
+    container_name: zookeeper
+    image: deusnexus/zookeeper
+    # environment:
+    #   ZOO_4LW_COMMANDS_WHITELIST: "ruok,stat"  # Allow ruok and stat commands
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo ruok | nc localhost 2181 | grep imok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s  # Give some initial time for Zookeeper to start before checking health
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    networks:
+      - iotnet
+    ports:
+      - "2181:2181"  # Zookeeper client connections
+      - "7071:7071"  # JMX for Zookeeper
+
+  broker:
+    container_name: broker
+    image: deusnexus/broker
+    healthcheck:
+      test: ["CMD", "bash", "-c", "export KAFKA_OPTS=''; /usr/local/kafka/bin/kafka-topics.sh --list --bootstrap-server broker:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    networks:
+      - iotnet
+    ports:
+      - "9092:9092"  # Internal listener port
+      - "7072:7072"  # JMX for Broker
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      # KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker:29092,EXTERNAL://localhost:9092
+      # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      # KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092
+      # KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  
+  broker-2:
+    container_name: broker-2
+    image: deusnexus/broker
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    networks:
+      - iotnet
+    ports:
+      - "9093:9092"  # Kafka broker
+      - "7073:7072"  # JMX for Broker
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker:29093,EXTERNAL://localhost:9093
+      # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      # KAFKA_LISTENERS: INTERNAL://0.0.0.0:29093,EXTERNAL://0.0.0.0:9093
+      # KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      
+  broker-3:
+    container_name: broker-3
+    image: deusnexus/broker
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    networks:
+      - iotnet
+    ports:
+      - "9094:9092"  # Kafka broker
+      - "7074:7072"  # JMX for Broker
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker:29094,EXTERNAL://localhost:9094
+      # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      # KAFKA_LISTENERS: INTERNAL://0.0.0.0:29094,EXTERNAL://0.0.0.0:9094
+      # KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+  client:
+    container_name: client
+    image: deusnexus/client
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics.sh --list --bootstrap-server broker:9092 | grep -q 'iot-sensor-stream'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s  # Allow some initial time for Kafka broker to be ready and the client to attempt creating the topic
+    depends_on:
+      broker:
+        condition: service_healthy
+    networks:
+      - iotnet
+    environment:
+      KAFKA_BROKER_CONNECT: broker:9092
+
+  ###########################################################################
+  ## PROMETHEUS COLLECTS ALL THE METRICS FROM JMX ON ZOOKEEPER AND BROKERS ##
+  ###########################################################################
+  prometheus:
+    container_name: prometheus
+    image: deusnexus/prometheus
+    depends_on:
+      client:
+        condition: service_healthy
+    networks:
+      - iotnet
+    ports:
+      - "9090:9090" # Map docker prometheus which collect metrics using internal ports and publishes to public port
+
+  #########################################################################
+  ## APACHE SPARK CAN NOW CONNECT TO CASSANDRA AND READ THE KAFKA STREAM ##
+  ##         PROCESSING OF OUTLIERS AND WRITING TO DB WILL START         ##
+  #########################################################################
+  spark-processing:
+    container_name: spark-processing
+    image: deusnexus/spark-processing
+    depends_on:
+      client:
+        condition: service_healthy
+    networks:
+      - iotnet
+    environment:
+      KAFKA_BROKER_CONNECT: broker:9092
+      CASSANDRA_HOST: cassandra:9042
+
+  ################################################################################
+  ## HERE WE START THE KAFKA PRODUCERS AND POPULATE THE TOPIC IOT-SENSOR-STREAM ##
+  ##      CHANGE THE REPLICATE COUNT TO INCREASE THE NUMBER OF IOT STATIONS     ##
+  ################################################################################
+  iot_station:
+    image: deusnexus/producer
+    depends_on:
+      client:
+        condition: service_healthy
+    deploy:
+      replicas: 20
+    networks:
+      - iotnet
+
+  ################################################################################################
+  ##  LASTLY GRAFANA DASHBOARD IS RUN WHICH IS EXPOSED TO THE LOCALHOST BY PORT FORMWARDING     ##
+  ##  ALL SERVICES RUN IN IOTNET BUT CAN BE MADE ACCESSIBLE BY EXPOSING PORTS ON LOCAL MACHINE  ##
+  ##  GO TO http://127.0.0.1:3001 in browser to see Grafana Dashboard. User: admin Pass: admin  ##
+  ################################################################################################
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    depends_on:
+      client:
+        condition: service_healthy
+    volumes:
+      - ./docker/grafana/defaults.ini:/etc/grafana/grafana.ini
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=1s
+    networks:
+      - iotnet
+    ports:
+      - "3001:3001"
+
+networks:
+  iotnet:
+    external: true

@@ -28,6 +28,8 @@ RUN wget ${KAFKA_BASE_URL}/${KAFKA_VERSION}/kafka_2.13-${KAFKA_VERSION}.tgz \
 # Stage 2: Final stage
 FROM openjdk:11-jre-slim
 
+RUN apt-get update && apt-get install -y netcat
+
 # Re-declare ARG before using it in the COPY command
 ARG KAFKA_VERSION
 
