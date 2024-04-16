@@ -36,6 +36,9 @@ Terminal - Launch all required Docker containers:
 That's it! Now wait for it to launch, spark-processing and grafana are last containers to launch. After that you can open the Grafana Dashboard on localhost:3001.
 Use the login details User: admin, Pass: admin, and you can skip creating new password.
 
+**Docker Deployment with single docker-compose (~12mb GIF):**
+![Docker Deployment with docker-compose (~12mb)](/images/docker_compose_one.gif)
+
 
 ## Running the containers using multiple docker-compose (OLD)
 Create the iotnet network which the docker containers can connect to:
@@ -64,8 +67,8 @@ You can also optionally start Grafana to view the metrics on dashboard (http://l
 
 It's also possible to run it as a daemon in background but you won't be able to see the console output.
 
-**Docker Deployment with docker-compose (~28mb GIF):**
-![Docker Deployment with docker-compose (~28mb)](/images/docker_compose.gif)
+**Docker Deployment with multiple docker-compose (~14mb GIF):**
+![Docker Deployment with docker-compose (~14mb)](/images/docker_compose_multiple.gif)
 
 
 
