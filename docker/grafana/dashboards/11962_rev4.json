@@ -4983,12 +4983,14 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {
     "hidden": false,
     "refresh_intervals": [
+      "1s",
+      "3s",
       "5s",
       "10s",
       "30s",
@@ -5001,6 +5003,7 @@
       "1d"
     ],
     "time_options": [
+      "1m",
       "5m",
       "15m",
       "1h",

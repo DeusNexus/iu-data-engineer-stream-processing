@@ -201,7 +201,7 @@ services:
       client:
         condition: service_healthy
     deploy:
-      replicas: 20
+      replicas: 50
     networks:
       - iotnet
 
