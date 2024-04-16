@@ -22,7 +22,22 @@ Periodic processing of batches can help to gain insight into long term developme
 Docker Architecture Diagram
 ![Design of ](/images/uml.jpg)
 
-## Running the containers
+## Running the containers using one docker-compose! (NEW)
+The new docker-compose.yaml includes health checks for each of the required containers so only the next dependant launches after it passes the healthcheck condition.
+
+Create the iotnet network which the docker containers can connect to:
+
+`docker network create iotnet`
+
+Terminal - Launch all required Docker containers:
+
+`cd iu-data-engineer-stream-processing && docker-compose up`
+
+That's it! Now wait for it to launch, spark-processing and grafana are last containers to launch. After that you can open the Grafana Dashboard on localhost:3001.
+Use the login details User: admin, Pass: admin, and you can skip creating new password.
+
+
+## Running the containers using multiple docker-compose (OLD)
 Create the iotnet network which the docker containers can connect to:
 
 `docker network create iotnet`
