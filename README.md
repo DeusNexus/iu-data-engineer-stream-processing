@@ -138,15 +138,23 @@ Prometheus root dir: /usr/local/prometheus-2.50.1.linux-amd64
 Prometheus Config File: /usr/local/prometheus-2.50.1.linux-amd64/prometheus.yml
 
 Config File Example:
+
 ``
+
     # my global config
+
     global:
+
     scrape_interval: 2s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+
     evaluation_interval: 2s # Evaluate rules every 15 seconds. The default is every 1 minute.
+
     # scrape_timeout is set to the global default (10s).
 
     # Alertmanager configuration
+
     alerting:
+
     alertmanagers:
         - static_configs:
             - targets:
@@ -154,12 +162,17 @@ Config File Example:
 
     # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
     rule_files:
+
     # - "first_rules.yml"
+
     # - "second_rules.yml"
 
     # A scrape configuration containing exactly one endpoint to scrape:
+
     # Here it's Prometheus itself.
+
     scrape_configs:
+    
     # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
     - job_name: "kafka"
 
@@ -168,6 +181,7 @@ Config File Example:
 
         static_configs:
         - targets: ["localhost:7071","localhost:7072"]
+
 ``
 
 Grafana: http://localhost:3001/dashboards
