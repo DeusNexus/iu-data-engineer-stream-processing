@@ -170,10 +170,50 @@ Config File Example:
 Grafana: http://localhost:3001/dashboards
 
 ## Evaluation
-..
+This section assesses how well the system meets the project's objectives outlined in the "Problem Statement." The evaluation focused on system scalability, reliability, flexibility, and the effectiveness of real-time alerts.
+
+- **Scalability**: Apache Cassandra's ability to handle high throughput and its fault tolerance were tested under increased load scenarios. The system effectively scaled up to accommodate additional sensor data streams without degradation in performance.
+- **Reliability**: The integration of Apache Spark Streaming ensured robust processing of streaming data. The system maintained a high uptime, and no critical failures occurred during the evaluation phase.
+- **Flexibility**: The system was tested for its adaptability to new types of sensors and data formats. Additional sensor types were simulated, and the system's capability to incorporate these without significant changes was successfully demonstrated.
+- **Real-Time Alerts**: The effectiveness of the alert system was evaluated by introducing threshold breaches in the simulated data. The system promptly detected these incidents and triggered alerts, confirming its capability to operate effectively in a near-real-time environment.
 
 ## Reflection
-..
+Reflecting on the project, several key learning points and challenges emerged:
+
+**Learning Points**:
+The application of Apache Spark Streaming in real-time data analysis and its integration with Apache Kafka and Cassandra offered practical insights into building scalable and reliable data pipelines.
+Gaining hands-on experience with Docker was instrumental in understanding containerization and its benefits in deploying complex applications.
+
+**Challenges**:
+One of the main challenges was configuring the interaction between Kafka, Spark, and Cassandra to ensure data integrity and minimal latency.
+Balancing the load across the system to prevent bottlenecks, especially during peak data inflows, required iterative testing and tuning.
+
+**Recommendations**:
+Future iterations could explore advanced machine learning models to enhance anomaly detection accuracy.
+Consider implementing a more dynamic system that adjusts thresholds and parameters based on historical data trends automatically.
+
+**Improvements**:
+Implementing a more sophisticated monitoring system to track performance metrics and system health more effectively could be beneficial.
+Enhancing the user interface for the alert system to provide more detailed information to city officials and citizens.
+
+## What I Learned
+- **Integration Complexity**: The project deepened my understanding of integrating Apache Spark with Apache Kafka within a Dockerized environment, showcasing the complexities and nuances of network communications in containerized applications.
+- **Container Networking**: I learned the importance of network settings in Docker, particularly how service names are resolved within and across different Docker networks.
+- **Environmental Variables and JMX**: The experience highlighted the critical role of environment variables in configuring services, especially the impact of Java Management Extensions (JMX) on Kafka's operational parameters.
+
+### Challenges Occurred
+- **Network Resolution**: A significant challenge was the inability of Apache Spark to resolve the internal names of Kafka containers like 'broker' and 'zookeeper' when running outside the iotnet Docker network. This required Spark to be constrained within the same network to communicate effectively with Kafka.
+- **JMX Configuration**: Setting up JMX for Kafka metrics monitoring introduced complications. An improperly set JMX environment variable led to errors when attempting to interact with Kafka, such as creating topics. This was resolved by clearing the JMX variable, demonstrating the delicate balance required in environment configurations.
+
+### Recommendations Suggested
+- **Network Configuration Review**: For future projects, a thorough review and possibly a redesign of network configurations may help avoid similar issues. Using Docker's network aliases or adjusting Docker Compose settings might provide a more robust solution.
+- **Environmental Variable Management**: Implementing a more dynamic management system for environment variables could prevent issues related to service configuration, especially in complex, multi-container setups.
+
+### Improvements
+- **Outlier Detection Algorithm**: The current system detects outliers using quantile thresholds, which is not always effective, particularly for distributions close to zero where the use of the ABS function to avoid negative values still results in frequent false positives.
+- **Investigation of Transformation Methods**: A deeper investigation into the statistical methods used for outlier detection is recommended. Considering alternative approaches such as transforming the data using logarithmic or square root scales might reduce the occurrence of false positives.
+- **Enhanced Monitoring and Alerts**: Improving the granularity and responsiveness of monitoring systems can lead to better detection and handling of operational issues in real-time, especially in a distributed system like this where multiple components interact closely.
+
 
 # How to get started
 ## Installation instructions
@@ -182,14 +222,10 @@ Grafana: http://localhost:3001/dashboards
 3. Install docker and docker-compose to your the local filesystem.
 4. Follow the steps from begin of README.md at the top ('Running the containers')
 
-# Reflection
-- What I learned ...
-- What challenges occured ...
-- What recommendations are suggested ...
-- What could be improved ...
-
 # Conclusion
-Did we achieve the goal etc and how?
+The project successfully achieved its objective of developing a scalable, reliable, and flexible system capable of processing real-time environmental sensor data. The system effectively alerts when environmental thresholds are exceeded, demonstrating its potential to assist municipalities in proactive environmental management. While there are areas for further enhancement, the foundational goals of the project have been met, providing a robust platform for future expansion and refinement.
+
+These sections aim to comprehensively summarize the project outcomes, learnings, and future directions, providing a clear and informative closure to the README.md document.
 
 # Disclaimer
 The developed application is licensed under the GNU General Public License.
