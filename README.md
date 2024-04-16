@@ -139,8 +139,6 @@ Prometheus Config File: /usr/local/prometheus-2.50.1.linux-amd64/prometheus.yml
 
 Config File Example:
 
-``
-
     # my global config
 
     global:
@@ -172,7 +170,7 @@ Config File Example:
     # Here it's Prometheus itself.
 
     scrape_configs:
-    
+
     # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
     - job_name: "kafka"
 
@@ -181,8 +179,6 @@ Config File Example:
 
         static_configs:
         - targets: ["localhost:7071","localhost:7072"]
-
-``
 
 Grafana: http://localhost:3001/dashboards
 
